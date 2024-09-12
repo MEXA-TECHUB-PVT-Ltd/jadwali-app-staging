@@ -250,7 +250,7 @@ const handleDeleteQuestion = async () => {
                 })
               }>
              
-                            <Ionicons
+                <Ionicons
                 name={'pencil-outline'}
                 size={18}
                 color={'purple'}
@@ -726,6 +726,7 @@ const handleDeleteQuestion = async () => {
               fromedit={fromEdit}
               eventData={AllEventData?.result}
             />
+            
             <Text
               ml={1}
               fontSize={16}
@@ -904,7 +905,7 @@ const handleDeleteQuestion = async () => {
               </Text>
               <View bg={'secondary'} p={3} rounded={'md'}>
                 <Row alignItems={'center'} justifyContent={'space-between'}>
-                  <Text color={'grey.400'}>Name,Email</Text>
+                  <Text color={'grey.400'}>Name, Email</Text>
                   {/* <Pressable
                     onPress={() => {
                       setSelected(false);

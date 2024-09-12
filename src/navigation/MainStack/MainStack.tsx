@@ -63,6 +63,7 @@ export default function MainStack() {
     await dispatch(setPassword(userId));
   }, [uid]);
   console.log(uid);
+  
   const deviceAPiLevel = Platform.Version;
 
   const pushNoti = async () => {
@@ -169,16 +170,10 @@ export default function MainStack() {
               <Stack.Screen name="ResetPassword" component={ResetPassword} />
               <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
               <Stack.Screen name="VerifyOtp" component={VerifyOtp} />
-              <Stack.Screen
-                name="Availability"
-                component={AvailabilityScreen}
-              />
+              <Stack.Screen name="Availability" component={AvailabilityScreen} />
               <Stack.Screen name="Services" component={Services} />
               <Stack.Screen name="Appoinment" component={AppoinmentType} />
-              <Stack.Screen
-                name="EmailVerification"
-                component={EmailVerification}
-              />
+              <Stack.Screen name="EmailVerification" component={EmailVerification} />
             </Stack.Group>
           )}
         </Stack.Navigator>

@@ -35,11 +35,9 @@ import AlertSnackBar from '../../components/customSnackBar/AlertSnackBar';
 import {Formik} from 'formik';
 import {Picker, DatePicker} from 'react-native-wheel-pick';
 
-
-
 const AddEvent = ({navigation, route}) => {
   const meetingType = route?.params?.one;
-  console.log("Check Metting Type",meetingType)
+  // console.log("Check Metting Type",meetingType)
   const fromEdit = route?.params?.fromEdit;
   const [min, setMin] = React.useState();
   const id = route?.params?.id;
@@ -59,12 +57,13 @@ const AddEvent = ({navigation, route}) => {
   const [price, setPrice] = React.useState('');
   const [deposit, setDeposit] = React.useState('');
   const [desc, setDesc] = React.useState('');
-  const [duration, setDuration] = React.useState('');
-  const [duration1, setDuration1] = React.useState('');
+  const [duration1, setDuration1] = React.useState(null); //hour
+  const [duration, setDuration] = React.useState(null); //min
 const [pressed, setPressed] = React.useState(1);
 
 
 const startTimePM = [
+  '00',
   '1',
   '2',
   '3',
@@ -88,7 +87,6 @@ const startTimePM = [
   '21',
   '22',
   '23',
-  '00',
 ];
 const timeMinutes = [
   '00',
@@ -160,8 +158,6 @@ const timeMinutes = [
     {data: updateData, error: updateError, isLoading: updateLoading},
   ] = useUpdateEventDetailMutation();
 
-
-
   React.useEffect(() => {
     setLanguage(i18n.language);
   }, [i18n.language]);
@@ -175,20 +171,33 @@ const timeMinutes = [
 
   const working = [{id: 1, name: 'book'}];
   const openBottomSheet = () => {
-    console.log('open bottom sheet called')
+    setDuration1('00');
+    setDuration('00');
     if (bottomSheetRef.current) {
       bottomSheetRef.current.open();
     } else {
     }
     // setModalVisible(true);
   };
-
   const closeBottomSheet = () => {
     if (bottomSheetRef.current) {
       bottomSheetRef.current.close();
     }
     // setModalVisible(false);
   };
+
+  const handleSaveTime = () => {
+    // If only one value is selected, set the other to '00'
+    const finalDuration1 = duration1 ? duration1 : '00';  // Use '00' if not selected
+    const finalDuration = duration ? duration : '00';     // Use '00' if not selected
+    // Update state with final values
+    setDuration1(finalDuration1);
+    setDuration(finalDuration);
+    // Close the bottom sheet
+    closeBottomSheet();
+  };
+
+
 
   const [pressed1, setPressed1] = React.useState(2);
   const [modalVisible, setModalVisible] = React.useState(false);
@@ -235,7 +244,7 @@ const timeMinutes = [
           ...(duration_interval && { duration_interval }),
            one_to_one: meetingType      
         };
-      console.log("Check Body",body)
+      // console.log("Check Body",body)
         const res = await postEvent(body);
         if (res?.data?.status === true) {
           await dispatch(
@@ -388,7 +397,7 @@ const timeMinutes = [
                   fontFamily={'NotoSans-SemiBold'}
                   fontSize={18}
                   mt={2}
-                  leftIconName={'Trophy'}
+                  leftIconName={'award'}
                   value={values?.name}
                   onChangeText={handleChange('name')}
                 />
@@ -482,7 +491,7 @@ const timeMinutes = [
                     
                     // onPressIn={()=>openBottomSheet()}
                     height={50}
-                    value={duration === '' ? null : `${duration1} hours ${duration} minutes`}
+                    value={duration1 === null && duration === null ? null : `${duration1 || '00'} hours ${duration || '00'} minutes`}                    // value={duration === '' ? null : `${duration1} hours ${duration} minutes`}
                     rounded={'full'}
                     bg={'secondary'}
                     borderWidth={0}
@@ -536,7 +545,13 @@ const timeMinutes = [
             defaultOff={true}
             height={'45%'}
             width={'100%'}
-            openBottom={bottomSheetRef}>
+            openBottom={bottomSheetRef}
+              // onOpen={() => {
+              //   // Set default values if duration1 or duration are null
+              //   setDuration1(duration1 || '00');
+              //   setDuration(duration || '00');
+              // }}
+            >
             <Text fontSize={16} fontFamily={'NotoSans-SemiBold'} mt={5}>
               Duration
             </Text>
@@ -586,9 +601,10 @@ const timeMinutes = [
           <View>
               <View style={{width: '80%', alignSelf: 'center'}}>
                 <JdButton
-                  onPress={() => {
-                    closeBottomSheet();
-                  }}
+                  onPress={handleSaveTime}
+                  // onPress={() => {
+                  //   closeBottomSheet();
+                  // }}
                   title="Save Time"
                 />
               </View>

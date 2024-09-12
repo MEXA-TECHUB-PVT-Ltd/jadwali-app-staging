@@ -110,6 +110,9 @@ import { Icon, Input, Pressable, Row, Text, View } from 'native-base';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import Feather from 'react-native-vector-icons/Feather';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import EvilIcons from 'react-native-vector-icons/EvilIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTranslation } from 'react-i18next';
 import i18n from '../../translations/i18n';
@@ -174,17 +177,22 @@ const JdInputs = props => {
         InputLeftElement={
           <Icon
             as={
-              props?.leftIconName === 'person' ||
-                props?.leftIconName === 'search-outline' ? (
+              props?.leftIconName === 'person' || props?.leftIconName === 'search-outline' ? (
                 <Ionicons name={props.leftIconName} />
               ) : props?.price ? (
                 <MaterialIcons name={props?.leftIconName} />
+              ) : props?.leftIconName === 'award' ? (
+                <Feather name={props.leftIconName} />
+              ) : props?.leftIconName === 'map-marker' ? (
+                <FontAwesome name={props.leftIconName} />
+              ) : props?.leftIconName === 'question' ? (
+                <EvilIcons name={props.leftIconName} />
               ) : (
                 <AntDesign name={props.leftIconName} />
               )
             }
             size={5}
-            mx={2}
+            mx={3}
             color="muted.600"
           />
         }

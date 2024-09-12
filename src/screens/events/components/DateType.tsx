@@ -104,12 +104,7 @@ const DateType = props => {
                   alignItems={'center'}
                   justifyContent={'space-between'}
                   w={'100%'}>
-                  <View
-                    bg={selected === item?.id ? 'primary.50' : 'secondary'}
-                    h={3}
-                    w={3}
-                    rounded={'full'}
-                  />
+                  
                   <Input
                     w={'30%'}
                     borderWidth={0}
@@ -165,6 +160,17 @@ const DateType = props => {
                     <Select.Item label="Working Days" value="key1" p={2} />
                   </Select>
                 </Row>
+                <View mt={4}>
+                <Row
+                  alignItems={'center'}
+                  flexDir={props?.translation === 'ar' ? 'row-reverse' : null}
+                >
+                <View
+                  bg={selected === item?.id ? 'primary.50' : 'secondary'}
+                  h={3}
+                  w={3}
+                  rounded={'full'}
+                />
                 <Text
                   mx={5}
                   fontSize={15}
@@ -172,6 +178,8 @@ const DateType = props => {
                   color={selected === item?.id ? 'primary.50' : 'grey.400'}>
                   {t(item?.name)}
                 </Text>
+                </Row>
+                </View>
               </>
             ) : (
               <View mt={2}>
@@ -194,10 +202,10 @@ const DateType = props => {
                 </Row>
                 {selected === item?.id && selected === 2 ? (
                   <Pressable
-                  // onPress={() => {
-                  //   navigation.navigate('CustomDate', {eventId: props?.eid}
-                  //   );
-                  // }}
+                  onPress={() => {
+                    navigation.navigate('CustomDate', {eventId: props?.eid}
+                    );
+                  }}
                   >
                     <Input
                       w={'70%'}

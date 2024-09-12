@@ -305,6 +305,7 @@ try {
                 fontFamily={'NotoSans-SemiBold'}
                 fontSize={18}
                 // placeholder={'Questions'}
+                leftIconName={'questioncircleo'}
                 value={values.question}
                 onChangeText={handleChange('question')}
               />

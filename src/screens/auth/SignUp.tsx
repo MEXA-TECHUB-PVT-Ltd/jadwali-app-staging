@@ -184,6 +184,12 @@ const SignUp = ({ navigation }: any) => {
     }
   };
   console.log("isError", isError)
+
+  const handleEmailChange = (handleChange) => (text) => {
+    const trimmedText = text.trim();
+    handleChange('email')(trimmedText);
+  };
+
   return (
     <ScrollView keyboardShouldPersistTaps="handled" flex={1} bg={'white'}>
       <Header />
@@ -230,7 +236,8 @@ const SignUp = ({ navigation }: any) => {
                 <JdInputs
                   placeholder={'Enter your Email'}
                   leftIconName={'mail'}
-                  onChangeText={handleChange('email')}
+                  onChangeText={handleEmailChange(handleChange)}
+                  // onChangeText={handleChange('email')}
                   value={values.email}
                   height={50}
                   autoCapitalize={'none'}

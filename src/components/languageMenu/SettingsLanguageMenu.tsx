@@ -34,7 +34,6 @@ const SettingsLanguageMenu = ({ isVisible, onClose }) => {
             <Menu
                 style={{
                     borderRadius: 10,
-                    marginTop: 30,
                 }}
                 visible={isVisible}
                 onRequestClose={onClose}

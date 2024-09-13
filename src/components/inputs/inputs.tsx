@@ -151,7 +151,7 @@ const JdInputs = props => {
       <Input
         mt={1}
         p={2}
-        style={{ height: Platform.OS == "ios" ? 50 : props?.height }} // Set the height using style prop
+        style={{ height: Platform.OS == "ios" ? 50 : props?.height }}
         flexDirection={currentLanguage === 'ar' ? 'row-reverse' : null}
         type={show === true ? props?.type : 'text'}
         placeholder={t(props.placeholder)}

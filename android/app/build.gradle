@@ -1,6 +1,5 @@
 apply plugin: "com.android.application"
 apply plugin: "com.facebook.react"
-apply plugin: 'com.google.gms.google-services' // <--- this should be the last line
 project.ext.vectoricons = [
     iconFontNames: [ 'MaterialIcons.ttf', 'FontAwesome.ttf','Ionicons.ttf','AntDesign.ttf','Feather.ttf','Entypo.ttf','Octicons.ttf','MaterialCommunityIcons.ttf','EvilIcons.ttf' ] // Name of the font files you are using.
 ]
@@ -121,10 +120,11 @@ dependencies {
     implementation project(':react-native-maps')
     implementation 'com.google.android.gms:play-services-base:17.6.0'
     implementation 'com.google.android.gms:play-services-maps:18.0.2'
+    implementation 'com.google.android.gms:play-services-auth:19.2.0'
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
     implementation 'com.google.android.gms:play-services-location:21.0.1'
-     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0' 
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0' 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
         exclude group:'com.squareup.okhttp3', module:'okhttp'
@@ -139,3 +139,4 @@ dependencies {
 }
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
+apply plugin: 'com.google.gms.google-services'

@@ -19,6 +19,7 @@ import Logo from '../../components/logo/Logo';
 import { useTranslation } from 'react-i18next';
 import i18n from '../../translations/i18n';
 import { useAuthenticateUserWithGoogleMutation } from '../../redux/googleAuth/googleAut';
+import auth from '@react-native-firebase/auth';
 import {
   GoogleSignin,
   statusCodes,
@@ -105,6 +106,10 @@ const SignUp = ({ navigation }: any) => {
       });
       await GoogleSignin.hasPlayServices();
       const data = await GoogleSignin.signIn();
+      const idToken = data.idToken;
+
+      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+      await auth().signInWithCredential(googleCredential);
 
       if (data) {
         const loginBody = {

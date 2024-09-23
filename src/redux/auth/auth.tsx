@@ -176,6 +176,15 @@ export const AuthApi = createApi({
       },
       invalidatesTags: ['getUser', 'getServiceTypes'],
     }),
+    // irfan added this mutation to delete user account
+    deleteUser: builder.mutation({
+      query: (id) => ({
+        url: `api/users/delete/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['getUser'],
+    }),
+
   }),
 });
 
@@ -200,4 +209,5 @@ export const {
   useGetUserServiceTypesQuery,
   useUpdateUserServiceMutation,
   useUpdateUserServiceTypesMutation,
+  useDeleteUserMutation, //irfan added this to export
 } = AuthApi;

@@ -52,7 +52,7 @@ const SignUp = ({ navigation }: any) => {
     email: Yup.string().email('Invalid email').required('Email is required'),
     password: Yup.string()
       .required(
-        `A password with aleast 8 characters ${'\n'}Use a few words, avoid common phrases`,
+        `A password with atleast 8 characters ${'\n'}Use a few words, avoid common phrases`,
       )
       .matches(
         /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?\/\\~-])[A-Za-z\d!@#$%^&*()_+{}\[\]:;<>,.?\/\\~-]{8,}$/,

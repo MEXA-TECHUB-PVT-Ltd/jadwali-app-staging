@@ -274,7 +274,7 @@ const Location = ({ navigation, route }) => {
   }, [isError, updateError]);
   return (
     <View bg={'white'} flex={1}>
-      <Header title={fromEdit === true ? 'Edit Location' : 'set Location'} />
+      <Header title={fromEdit === true ? 'Edit Location' : 'Set Location'} />
       <ScrollView
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
@@ -349,14 +349,16 @@ const Location = ({ navigation, route }) => {
           </Text> */}
           {selected === 2 && (
             <>
-              <Pressable>
+              <Pressable 
+                onPressIn={() => navigation.navigate('Maps')}
+              >
                 <Input
                   mt={5}
                   placeholder={t('Set location on Map')}
                   rounded={'full'}
                   bg={'secondary'}
                   height={50}
-                  onPressIn={()=>navigation.navigate('Maps')}
+                  // onPressIn={()=>navigation.navigate('Maps')}
                   isReadOnly={true}
                   borderWidth={0}
                   InputRightElement={
@@ -393,10 +395,11 @@ const Location = ({ navigation, route }) => {
                 fontSize={16}
                 fontFamily={'NotoSans-SemiBold'}
                 value={address}
+                leftIconName={'map-marker'}
                 onFocus={() => setFocus(true)}
                 onBlur={() => setFocus(false)}
                 onChangeText={txt => {
-                  setAddress(txt);
+                setAddress(txt);
                 }}
 
               />
@@ -434,13 +437,14 @@ const Location = ({ navigation, route }) => {
               </Row>
               <TextArea
                 mt={2}
-                p={5}
+                p={4}
                 borderRadius={10}
                 maxLength={maxCount}
                 bg={'secondary'}
                 borderWidth={0}
                 // numberOfLines={6}
                 h={160}
+                placeholder="Add note"
                 value={postalCode}
                 onChangeText={txt => {
                   setPostalCode(txt);

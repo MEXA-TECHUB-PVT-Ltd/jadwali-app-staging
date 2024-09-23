@@ -35,6 +35,8 @@ const SignIn = ({ navigation }: any) => {
   const dispatch = useDispatch();
   const d = useSelector(state => state?.auth?.userData);
 
+  // console.log('userData is: ', d);
+
   const [
     loginUser,
     { data: userData, isLoading: SignInLoading, error: isError },

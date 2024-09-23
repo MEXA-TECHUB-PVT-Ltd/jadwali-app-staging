@@ -15,22 +15,26 @@ import LanguageMenu from '../../../components/languageMenu/LanguageMenu';
 import SettingsLanguageMenu from '../../../components/languageMenu/SettingsLanguageMenu';
 import AlertModal from '../../../components/Modal/AlertModal';
 import { useTranslation } from 'react-i18next';
-import { removeStorageData } from '../../../Async/AsyncStorage/AsyncStorage';
-import { useDispatch } from 'react-redux';
-import { setPassword } from '../../../redux/fatures/auth';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
+import { useDeleteUserMutation } from '../../../redux/auth/auth';
+import { setPassword, setUserData } from '../../../redux/fatures/auth';
+import { removeStorageData, resetStorage } from '../../../Async/AsyncStorage/AsyncStorage';
+import { useSelector, useDispatch } from 'react-redux';
+
 
 const SettingsMenu = props => {
+  const navigation = useNavigation();
   const dispatch = useDispatch();
   const [modalVisible, setModalVisible] = React.useState<boolean>(false);
-  const [deleteModalVisible, setDeleteModalVisible] = React.useState<boolean>(false);
-  const navigation = useNavigation();
-  const languageMenuRef = useRef(null);
-
   const [isMenuVisible, setMenuVisible] = React.useState(false);
-
+  const [deleteModalVisible, setDeleteModalVisible] = React.useState<boolean>(false);
+  
+  const [deleteUser] = useDeleteUserMutation();
+  const ID = useSelector((state) => state?.auth?.userData);
+  const userId = ID?.id;
+  console.log('user id in userData is : ', userId);
 
   const handleNavigation = id => {
     if (id === 1) {
@@ -89,8 +93,32 @@ const SettingsMenu = props => {
         message={t('Are you sure you want to delete account?')}
         modalVisible={deleteModalVisible}
         onPress={async () => {
-          // Add logic for deleting account here
-          setDeleteModalVisible(false);
+          try {
+            if (userId) {
+              console.log('Attempting to delete user with ID:', userId);
+              await resetStorage();
+              await removeStorageData('uid');
+              await dispatch(setUserData(null));
+              await dispatch(setPassword(null));
+
+              // Log response to confirm the request
+              const response = await deleteUser(userId);
+              console.log('Delete user response:', response);
+
+              // Check response status or handle errors
+              if (response.error) {
+                console.error('Failed to delete user:', response.error);
+              } else {
+                console.log('Account deleted successfully with userId:', userId);
+              }
+            } else {
+              console.error('User ID not found, cannot delete account.');
+            }
+          } catch (error) {
+            console.error('Failed to delete account:', error);
+          } finally {
+            setDeleteModalVisible(false);
+          }
         }}
         setModalVisible={setDeleteModalVisible}
       />
@@ -154,7 +182,6 @@ const SettingsMenu = props => {
           );
         }
       })}
-       {/* <LanguageMenu ref={languageMenuRef} /> */}
     </>
   );
 };

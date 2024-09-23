@@ -81,7 +81,7 @@ const FeedBack = ({navigation}) => {
         />
       </View>
 
-      <View mt={'50%'} mx={5}>
+      <View mt={'40%'} mb={'2%'} mx={5}>
         <JdButton
           title={'Submit'}
           loading={isLoading}

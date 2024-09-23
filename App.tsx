@@ -13,7 +13,6 @@ import {DMSansFont, FontsStyle} from './src/constants/Fonts';
 import {Provider} from 'react-redux';
 import {store} from './src/redux/store';
 
-
 export default function () {
   const theme = extendTheme({
     fontConfig: {

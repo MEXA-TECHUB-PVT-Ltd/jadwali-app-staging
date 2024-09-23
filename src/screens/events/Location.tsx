@@ -391,7 +391,7 @@ const Location = ({ navigation, route }) => {
               <JdInputs
                 label={'Address Line'}
 
-                mt={5}
+                mt={4}
                 fontSize={16}
                 fontFamily={'NotoSans-SemiBold'}
                 value={address}
@@ -427,7 +427,7 @@ const Location = ({ navigation, route }) => {
               <Row
                 alignItems={'center'}
                 justifyContent={'space-between'}
-                mt={5}>
+                mt={0}>
                 <Text fontFamily={'NotoSans-SemiBold'} fontSize={15}>
                   {t('Address Notes')}
                 </Text>
@@ -482,7 +482,7 @@ const Location = ({ navigation, route }) => {
             </>
           )}
         </View>
-        <View mt={selected === 2 ? '20%' : '89%'} mb={2} mx={5}>
+        <View mt={selected === 2 ? '1%' : '89%'} mb={2} mx={5}>
           <JdButton
             title={'Continue'}
             onPress={() => {

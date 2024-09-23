@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "213240793812",
+    "project_id": "jad-mtechub",
+    "storage_bucket": "jad-mtechub.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:213240793812:android:481b2207b407696e778941",
+        "android_client_info": {
+          "package_name": "com.jadwali"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "213240793812-3ljsc2cdpukucl5tbt01cd8gcdjdfknf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jadwali",
+            "certificate_hash": "45bbcb5efc2ac54aa06a04cbc1c283929cd8bcb5"
+          }
+        },
+        {
+          "client_id": "213240793812-qm5487h7ov1spovlg5ftlgtucj5nu1mm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jadwali",
+            "certificate_hash": "63aad27073fb6c06f64d3008cde5721f260f4a2f"
+          }
+        },
+        {
+          "client_id": "213240793812-65iltp2jkv7cjgkbj7ffbg45fp088q2f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD73_FNavZJGkiwOxBnuSfH95GcVE5rxGs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "213240793812-65iltp2jkv7cjgkbj7ffbg45fp088q2f.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "213240793812-n835l58uas9h4i4qpb28l8m7aqls9l16.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.jadwali"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

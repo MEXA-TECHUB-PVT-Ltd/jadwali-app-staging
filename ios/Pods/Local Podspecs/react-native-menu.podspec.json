@@ -1,0 +1,21 @@
+{
+  "name": "react-native-menu",
+  "version": "0.9.1",
+  "summary": "UIMenu component for react-native",
+  "homepage": "https://github.com/react-native-menu/menu#readme",
+  "license": "MIT",
+  "authors": "Jesse Katsumata <jesse.katsumata@gmail.com> (https://github.com/Naturalclar)",
+  "platforms": {
+    "ios": "9.0"
+  },
+  "source": {
+    "git": "https://github.com/react-native-menu/menu.git",
+    "tag": "0.9.1"
+  },
+  "source_files": "ios/**/*.{h,m,mm,swift}",
+  "dependencies": {
+    "React": [
+
+    ]
+  }
+}

@@ -30,6 +30,14 @@
           }
         },
         {
+          "client_id": "213240793812-s9rk813cktstg7ackchbf2jrb06qdrdu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jadwali",
+            "certificate_hash": "f1b8b31d666a408e17199093a73367ac256d9a7d"
+          }
+        },
+        {
           "client_id": "213240793812-65iltp2jkv7cjgkbj7ffbg45fp088q2f.apps.googleusercontent.com",
           "client_type": 3
         }

@@ -24,6 +24,9 @@ import { useAddUserMutation, useLogninUserMutation } from '../../redux/auth/auth
 import { useDispatch, useSelector } from 'react-redux';
 import { setPassword, setUserData } from '../../redux/fatures/auth';
 import AlertSnackBar from '../../components/customSnackBar/AlertSnackBar';
+import AlertSnackBarOne from '../../components/customSnackBar/AlertSnackBarOne';
+import auth from '@react-native-firebase/auth';
+
 import {
   GoogleSignin,
   statusCodes,
@@ -31,178 +34,353 @@ import {
 import { storeData, storeObjectData } from '../../Async/AsyncStorage/AsyncStorage';
 
 const SignIn = ({ navigation }: any) => {
+  // const [modalVisible, setModalVisible] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState('');
+  const [isErrorEmail, setIsErrorEmail] = React.useState(false);
+  const [isErrorGoogleSignIn, setIsErrorGoogleSignIn] = React.useState(false);
+
   const [modalVisible, setModalVisible] = React.useState(false);
+  const [message, setMessage] = React.useState(null);
+
   const dispatch = useDispatch();
   const d = useSelector(state => state?.auth?.userData);
 
   // console.log('userData is: ', d);
 
   const [
-    loginUser,
-    { data: userData, isLoading: SignInLoading, error: isError },
+    loginUser,{ data: userData, isLoading: SignInLoading, error: isError },
   ] = useLogninUserMutation();
+  
   const [postUser] = useAddUserMutation();
 
   const formSchema = Yup.object().shape({
     email: Yup.string().email('Invalid email').required('Email is required'),
     password: Yup.string().required('Password is required'),
   });
+
+  // irfan code working for email
+  React.useEffect(() => {
+    // Show the modal only if there is an error message
+    if (errorMessage) {
+      setModalVisible(true);
+    } else {
+      setModalVisible(false);
+    }
+  }, [errorMessage]);
+
+  // irfan code for managing both email/google alerts not yet fully working
+  // React.useEffect(() => {
+  //   if (isErrorEmail || isErrorGoogleSignIn) {
+  //     setModalVisible(true);
+  //   } else {
+  //     setModalVisible(false);
+  //   }
+  // }, [isErrorEmail, isErrorGoogleSignIn]);
+
+  // sami code
+  // React.useEffect(() => {
+  //   if (isError) {
+  //     // Set the modal to visible when there's an error
+  //     setModalVisible(true);
+  //     setErrorMessage('Something went wrong!');
+  //   } else {
+  //     // Keep it hidden if there's no error
+  //     setModalVisible(false);
+  //   }
+  // }, [isError]);
+
+  // irfan code
   const handleCreate = (email, password) => {
+    // Reset error state before making a new request
+    setIsErrorEmail(false);
+    setErrorMessage('');
+
     const body = {
       email: email,
       password: password,
       type: 'email',
     };
-    loginUser(body).then(async res => {
-      if (res?.data?.status === true) {
-        await storeData('uid', `${res?.data?.result?.id}`);
-        await dispatch(setPassword(res?.data?.result?.id));
 
-        // setAlert(res?.data);
+    loginUser(body)
+      .then(async res => {
+        // Ensure that res and res.error exist before accessing their properties
+        if (res?.error) {
+          if (res.error.status === 'FETCH_ERROR') {
+            // Network error
+            setIsErrorEmail(true);
+            setErrorMessage('Network Error: Request failed')
+            // setErrorMessage(res.error.error);  // Display "TypeError: Network request failed"
+          } else if (res.error.status === 500 && res.error.data?.status === false) {
+            setIsErrorEmail(true);
+            setErrorMessage('Already registered with Google account! Try signing in with google.');
+          } else if (res.error.data?.status === false) {
+            // User not found
+            setIsErrorEmail(true);
+            setErrorMessage(res.error.data.message);
+          } else {
+            // Handle unexpected error
+            setIsErrorEmail(true);
+            setErrorMessage('An unexpected error occurred.');
+          }
+        } else if (res?.data?.status === true) {
+          // Successful response
+          await storeData('uid', `${res.data.result.id}`);
+          await dispatch(setPassword(res.data.result.id));
+          await dispatch(setUserData(res.data.result));
+          setModalVisible(true);
 
-        await dispatch(setUserData(res?.data?.result));
-        setModalVisible(true);
-      }
-    });
+          // Reset the error state in case of success
+          setIsErrorEmail(false);
+          setErrorMessage(''); // Clear error message on success
+        } else {
+          // Handle unexpected successful response structure
+          setIsErrorEmail(true);
+          setErrorMessage('An unexpected response format.');
+        }
+      })
+      .catch(error => {
+        // Handle network or other errors
+        setIsErrorEmail(true);
+        setErrorMessage('Something went wrong!');
+      });
   };
+
+
+
+  // sami code for handleCreate
+  // const handleCreate = (email, password) => {
+  //   const body = {
+  //     email: email,
+  //     password: password,
+  //     type: 'email',
+  //   };
+  //   loginUser(body).then(async res => {
+  //     console.log('email and password res in signin in handlecreate : ', res);
+  //     if (res?.data?.status === true) {
+  //       await storeData('uid', `${res?.data?.result?.id}`);
+  //       await dispatch(setPassword(res?.data?.result?.id));
+
+  //       // setAlert(res?.data);
+
+  //       await dispatch(setUserData(res?.data?.result));
+  //       setModalVisible(true);
+  //     }
+  //   });
+  // };
+
   const { t } = useTranslation();
   const [currentLanguage, setLanguage] = React.useState();
   React.useEffect(() => {
     setLanguage(i18n.language);
   }, [i18n.language]);
-  React.useEffect(() => {
-    if (isError) {
-      setModalVisible(true);
-    }
-  }, [isError]);
 
-  const googlelogin = async () => {
+  // irfan edited for resolving google signin not working for apk
+  async function googlelogin() {
     try {
-      signOut();
+      const currentUser = await GoogleSignin.getCurrentUser();
+      if (currentUser) {
+        // User is already signed in, so you might want to sign out first
+        await signOut();
+      }
+
+      // await signOut();
+
       GoogleSignin.configure({
         webClientId: '213240793812-65iltp2jkv7cjgkbj7ffbg45fp088q2f.apps.googleusercontent.com',
       });
+      // console.log('Google Sign-In configured with webClientId.');
       await GoogleSignin.hasPlayServices();
+      // console.log('Google Play Services are available.');
       const data = await GoogleSignin.signIn();
-
+      const user = data.user;
+      const idToken = data.idToken;
+      // console.log('User data:', user);
+      // console.log('idToken:', idToken);
+      const profile_picture = user.photo;
+      // console.log('profile picture url is : ',profile_picture)
+      // Authenticate with Firebase using idToken
+      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+      await auth().signInWithCredential(googleCredential);
+      // console.log('Signed in with Firebase.');
       if (data) {
         const loginBody = {
-          email: data.user.email,
+          email: user.email,
           type: 'google',
-          token: data?.idToken,
+          token: idToken,
+          profile_picture: profile_picture,
         };
 
         try {
+           // Trigger the login mutation but firstly wait for response
+          // const { data: loginResponse, error: isError } = await loginUser(loginBody);
           const loginResponse = await loginUser(loginBody);
+          // console.log('Login response:', loginResponse);
           if (loginResponse?.data?.message === 'Sign in successfully!') {
-            
+            // Handle successful login
             await storeData('uid', `${loginResponse?.data?.result?.id}`);
             await dispatch(setPassword(loginResponse?.data?.result?.id));
             await dispatch(setUserData(loginResponse?.data?.result));
-            //setModalVisible(true);
-            // await dispatch(setPassword(loginResponse?.data?.result?.id));
-            // setModalVisible(true);
-            // await dispatch(setUserData(loginResponse?.data?.result));
-          }
-          else {
+            // console.log('User logged in successfully.');
+          } else {
+            // Handle sign-up if login fails
             const signUpBody = {
               signup_type: 'google',
-              email: data?.user?.email,
-              full_name: `${data.user.familyName} ${data.user.givenName}`,
-              google_access_token: data?.idToken,
+              email: user.email,
+              full_name: `${user.familyName} ${user.givenName}`,
+              google_access_token: idToken,
             };
-
+            // console.log('Sign-Up body:', signUpBody);
             const signUpResponse = await postUser(signUpBody);
+            // console.log('Sign-Up response:', signUpResponse);
             if (signUpResponse?.data?.status === true) {
-              dispatch(setUserData(signUpResponse?.data?.result));
+              // Handle successful sign-up
               await storeObjectData('USERDATA', {
-                id: data?.user?.id,
-                first_name: data?.user?.givenName,
-                last_name: data?.user?.familyName,
-                email: data?.user?.email,
-                photo: data?.user?.photo,
+                id: user.id,
+                first_name: user.givenName,
+                last_name: user.familyName,
+                email: user.email,
+                photo: user.photo,
               });
               await storeData('uid', `${signUpResponse?.data?.result?.id}`);
               await dispatch(setPassword(signUpResponse?.data?.result?.id));
               await dispatch(setUserData(signUpResponse?.data?.result));
-              // setModalVisible(true);
-              // storeData('idToken', data?.idToken);
-              // Alert.alert("Congrates====")
-              // let fromSignin = true;
-              // navigation.navigate('Welcome', fromSignin);
-              // await dispatch(setUserData(res?.data?.result));
-              // let fromSignup = true;
-              // navigation.navigate('Welcome', fromSignup);
+              // console.log('User signed up and logged in successfully.');
             }
           }
         } catch (error) {
-          console.error('Error during login/signup:', error.response);
-          // Handle error during login/signup
+          // console.error('Error during login/signup:', error.response || error.message);
+          console.log('in catch block error : ',error)
         }
       }
     } catch (error) {
-      let errorMessage = 'An error occurred. Please try again.';
+      // Handle specific Google Sign-In errors
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        errorMessage = 'Login was cancelled.';
+        setErrorMessage('Google Sign-In Error: Login was cancelled.');
+        setModalVisible(true);
       } else if (error.code === statusCodes.IN_PROGRESS) {
-        errorMessage = 'Login is already in progress.';
+        setErrorMessage('Google Sign-In Error: Login is already in progress.');
+        setModalVisible(true);
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        errorMessage = 'Google Play Services is not available or outdated.';
+        setErrorMessage('Google Play Services not available.');
+        setModalVisible(true);
+      } else {
+        // General network error or other unknown errors
+        setErrorMessage('Network Error: Request failed');
+        setModalVisible(true);
       }
-      console.error('Google login error:', error);
-      // Handle Google login error
     }
-  };
+    
+    // catch (error) {
+    //   let errorMessage = 'An error occurred. Please try again.';
+    //   if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+    //     errorMessage = 'Login was cancelled.';
+    //   } else if (error.code === statusCodes.IN_PROGRESS) {
+    //     errorMessage = 'Login is already in progress.';
+    //   } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+    //     errorMessage = 'Google Play Services is not available or outdated.';
+    //   }
+    //   console.error('Google Sign-In Error:', errorMessage, error);
+    // }
+  }
 
+  // sami code for google signin
   // const googlelogin = async () => {
-  //   signOut();
   //   try {
+  //     signOut();
   //     GoogleSignin.configure({
-  //       webClientId:
-  //         '626538884992-i10ru8d2sq4ml8mtuhcj540qtmcomk3n.apps.googleusercontent.com',
+  //       webClientId: '213240793812-65iltp2jkv7cjgkbj7ffbg45fp088q2f.apps.googleusercontent.com',
   //     });
+  //     // Log configuration
+  //     console.log('Google Sign-In configured with webClientId.');
+
   //     await GoogleSignin.hasPlayServices();
+  //     console.log('Google Play Services are available.');
+
   //     const data = await GoogleSignin.signIn();
-  //     console.log("check Data", data)
+  //     console.log('Google Sign-In data:', data);
 
   //     if (data) {
-  //       const body = {
+  //       const loginBody = {
   //         email: data.user.email,
   //         type: 'google',
   //         token: data?.idToken,
   //       };
-  //       loginUser(body).then(async res => {
-  //         if (res?.data?.message === 'Sign in successfully!') {
-  //           await dispatch(setPassword(res?.data?.result?.id));
-  //           setModalVisible(true);
-  //           await dispatch(setUserData(res?.data?.result));
+
+  //       try {
+  //         const loginResponse = await loginUser(loginBody);
+  //         console.log('Login response:', loginResponse);
+
+  //         if (loginResponse?.data?.message === 'Sign in successfully!') {
+
+  //           await storeData('uid', `${loginResponse?.data?.result?.id}`);
+  //           await dispatch(setPassword(loginResponse?.data?.result?.id));
+  //           await dispatch(setUserData(loginResponse?.data?.result));
+  //           console.log('User logged in successfully.');
+  //           //setModalVisible(true);
+  //           // await dispatch(setPassword(loginResponse?.data?.result?.id));
+  //           // setModalVisible(true);
+  //           // await dispatch(setUserData(loginResponse?.data?.result));
   //         }
-  //       });
-  //       // const {displayName, uid, email} = data;
-  //       // const array = data?.user?.name?.split(' ');
+  //         else {
+  //           const signUpBody = {
+  //             signup_type: 'google',
+  //             email: data?.user?.email,
+  //             full_name: `${data.user.familyName} ${data.user.givenName}`,
+  //             google_access_token: data?.idToken,
+  //           };
+  //           console.log('Sign-Up body:', signUpBody);
+
+  //           const signUpResponse = await postUser(signUpBody);
+  //           console.log('Sign-Up response:', signUpResponse);
+  //           if (signUpResponse?.data?.status === true) {
+  //             dispatch(setUserData(signUpResponse?.data?.result));
+  //             await storeObjectData('USERDATA', {
+  //               id: data?.user?.id,
+  //               first_name: data?.user?.givenName,
+  //               last_name: data?.user?.familyName,
+  //               email: data?.user?.email,
+  //               photo: data?.user?.photo,
+  //             });
+  //             await storeData('uid', `${signUpResponse?.data?.result?.id}`);
+  //             await dispatch(setPassword(signUpResponse?.data?.result?.id));
+  //             await dispatch(setUserData(signUpResponse?.data?.result));
+  //             console.log('User signed up and logged in successfully.');
+  //             // setModalVisible(true);
+  //             // storeData('idToken', data?.idToken);
+  //             // Alert.alert("Congrates====")
+  //             // let fromSignin = true;
+  //             // navigation.navigate('Welcome', fromSignin);
+  //             // await dispatch(setUserData(res?.data?.result));
+  //             // let fromSignup = true;
+  //             // navigation.navigate('Welcome', fromSignup);
+  //           }
+  //         }
+  //       } catch (error) {
+  //         console.error('Error during login/signup:', error.response);
+  //         // Handle error during login/signup
+  //       }
   //     }
   //   } catch (error) {
+  //     let errorMessage = 'An error occurred. Please try again.';
   //     if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-  //       // user cancelled the login flow
-  //       console.log(error);
+  //       errorMessage = 'Login was cancelled.';
   //     } else if (error.code === statusCodes.IN_PROGRESS) {
-  //       // operation (e.g. sign in) is in progress already
-  //       console.log(error);
+  //       errorMessage = 'Login is already in progress.';
   //     } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-  //       // play services not available or outdated
-  //       console.log(error);
-  //     } else {
-  //       // some other error happened
-  //       console.log(error);
+  //       errorMessage = 'Google Play Services is not available or outdated.';
   //     }
+  //     console.error('Google login error:', error);
+  //     // Handle Google login error
   //   }
   // };
+
   const signOut = async () => {
     try {
       await GoogleSignin.signOut();
       //   this.setState({ user: null }); // Remember to remove the user from your app's state as well
     } catch (error) {
-      console.error(error);
+      // console.error(error);
+      console.log('error in signout : ', error);
     }
   };
 
@@ -404,7 +582,22 @@ const SignIn = ({ navigation }: any) => {
         }}
         setModalVisible={setModalVisible}
       /> */}
-      <AlertSnackBar
+
+      
+
+      <AlertSnackBarOne
+        message={errorMessage}
+        visible={modalVisible}
+        status={false}
+        onDismiss={() => {
+          setModalVisible(false);
+          setErrorMessage('');
+          setIsErrorEmail(false);
+        }}
+      />
+
+      {/* sami code */}
+      {/* <AlertSnackBar
         message={isError ? {
           message: isError.data?.message,
           status: false
@@ -414,7 +607,7 @@ const SignIn = ({ navigation }: any) => {
         onDismiss={() => {
           setModalVisible(false);
         }}
-      />
+      /> */}
     </ScrollView>
   );
 };

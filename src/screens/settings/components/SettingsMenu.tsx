@@ -31,6 +31,8 @@ const SettingsMenu = props => {
   const [isMenuVisible, setMenuVisible] = React.useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = React.useState<boolean>(false);
   const [snackBarVisible, setSnackBarVisible] = React.useState(false);
+  const [errorSnackBarVisible, setErrorSnackBarVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   const [deleteUser] = useDeleteUserMutation();
   const ID = useSelector((state) => state?.auth?.userData);
@@ -78,7 +80,13 @@ const SettingsMenu = props => {
 
         if (response.error) {
           // If there's an error, log it and do not proceed with any further actions
-          console.error('Failed to delete user:', response.error);
+          // console.error('Failed to delete user:', response.error);
+          console.log('Error message if user not deleted : ', response.error?.data?.message);
+          setErrorMessage(response.error?.data?.message);
+          setErrorSnackBarVisible(true);
+          setTimeout(() => {
+            setErrorSnackBarVisible(false);
+          }, 2500);
         } 
         else 
         {
@@ -167,7 +175,7 @@ const SettingsMenu = props => {
         heading={t('Delete Account?')}
         btntxt2={t('Delete')}
         btntxt1={t('Cancel')}
-        message={t('Are you sure you want to delete account?')}
+        message={t('After permanently deleting account, you cannot recover it.')}
         modalVisible={deleteModalVisible}
         onPress={handleDeleteAccount}
         // onPress={async () => {
@@ -202,11 +210,23 @@ const SettingsMenu = props => {
       />
 
       {snackBarVisible && (
+        <View style={styles.overlayADS}>
+          <View style={styles.snackbarContainerADS}>
+            <View style={styles.snackbarADS}>
+              <Text style={styles.snackbarTextADS}>
+                {t('Account deleted successfully!')}
+              </Text>
+            </View>
+          </View>
+        </View>
+      )}
+
+      {errorSnackBarVisible && (
         <View style={styles.overlay}>
           <View style={styles.snackbarContainer}>
             <View style={styles.snackbar}>
               <Text style={styles.snackbarText}>
-                {t('Account deleted. You can recover it within 90 days by contacting admin.')}
+                {errorMessage}
               </Text>
             </View>
           </View>
@@ -315,6 +335,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   snackbarText: {
+    color: 'white',
+  },
+
+  overlayADS: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0)',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    zIndex: 1,
+  },
+  snackbarContainerADS: {
+    backgroundColor: '#6C3',
+    // padding: 12,
+    borderRadius: 8,
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 16,
+    zIndex: 2,
+  },
+  snackbarADS: {
+    backgroundColor: '#6C3',
+    padding: 10,
+    borderRadius: 8,
+    width: '100%',
+    alignItems: 'center',
+  },
+  snackbarTextADS: {
     color: 'white',
   },
 });

@@ -8,7 +8,7 @@ import {
   View,
   Pressable,
 } from 'native-base';
-import React, {useRef, useEffect} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { useNavigation } from '@react-navigation/native';
 import LanguageMenu from '../../../components/languageMenu/LanguageMenu';
@@ -30,11 +30,12 @@ const SettingsMenu = props => {
   const [modalVisible, setModalVisible] = React.useState<boolean>(false);
   const [isMenuVisible, setMenuVisible] = React.useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = React.useState<boolean>(false);
-  
+  const [snackBarVisible, setSnackBarVisible] = React.useState(false);
+
   const [deleteUser] = useDeleteUserMutation();
   const ID = useSelector((state) => state?.auth?.userData);
   const userId = ID?.id;
-  console.log('user id in userData is : ', userId);
+  // console.log('user id in userData is : ', userId);
 
   const handleNavigation = id => {
     if (id === 1) {
@@ -68,6 +69,82 @@ const SettingsMenu = props => {
 
   const { t } = useTranslation();
 
+
+  const handleDeleteAccount = async () => {
+    try {
+      if (userId) {
+        // Attempt to delete the user first
+        const response = await deleteUser(userId);
+
+        if (response.error) {
+          // If there's an error, log it and do not proceed with any further actions
+          console.error('Failed to delete user:', response.error);
+        } 
+        else 
+        {
+          // If user deletion is successful, show the snackbar alert for 2 seconds
+          setSnackBarVisible(true);
+
+          setTimeout(async () => {
+            try {
+              // After the 2-second delay, clear storage and dispatch actions
+              // await resetStorage();
+              await removeStorageData('uid');
+              // await dispatch(setUserData(null));
+              await dispatch(setPassword(null));
+
+              console.log('Account deleted successfully with userId:', userId);
+
+              // Optionally: Navigate to another screen after successful deletion
+              // navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+            } catch (error) {
+              console.error('Error while clearing storage or dispatching actions:', error);
+            }
+          }, 2000); // Delay of 2 seconds to show the Snackbar-like message
+        }
+      } else {
+        console.error('User ID not found, cannot delete account.');
+      }
+    } catch (error) {
+      console.error('Error encountered during account deletion:', error);
+    } finally {
+      setDeleteModalVisible(false); // Close the delete modal in any case
+    }
+  };
+
+
+
+
+  // const handleDeleteAccount = async () => {
+  //   try {
+  //     if (userId) {
+  //       setSnackBarVisible(true);
+  //       setTimeout(async () => {
+  //         await resetStorage();
+  //         await removeStorageData('uid');
+  //         await dispatch(setUserData(null));
+  //         await dispatch(setPassword(null));
+
+  //         const response = await deleteUser(userId);
+  //         if (response.error) {
+  //           console.error('Failed to delete user:', response.error);
+  //         } else {
+  //           console.log('Account deleted successfully with userId:', userId);
+  //         }
+  //       }, 2000); // Delay to show the Snackbar-like message
+  //     } else {
+  //       console.error('User ID not found, cannot delete account.');
+  //     }
+  //   } catch (error) {
+  //     console.error('Failed to delete account:', error);
+  //   } finally {
+  //     setDeleteModalVisible(false);
+  //   }
+  // };
+
+
+
+
   return (
     <>
       <AlertModal
@@ -92,36 +169,50 @@ const SettingsMenu = props => {
         btntxt1={t('Cancel')}
         message={t('Are you sure you want to delete account?')}
         modalVisible={deleteModalVisible}
-        onPress={async () => {
-          try {
-            if (userId) {
-              console.log('Attempting to delete user with ID:', userId);
-              await resetStorage();
-              await removeStorageData('uid');
-              await dispatch(setUserData(null));
-              await dispatch(setPassword(null));
+        onPress={handleDeleteAccount}
+        // onPress={async () => {
+        //   try {
+        //     if (userId) {
+        //       console.log('Attempting to delete user with ID:', userId);
+        //       await resetStorage();
+        //       await removeStorageData('uid');
+        //       await dispatch(setUserData(null));
+        //       await dispatch(setPassword(null));
 
-              // Log response to confirm the request
-              const response = await deleteUser(userId);
-              console.log('Delete user response:', response);
+        //       // Log response to confirm the request
+        //       const response = await deleteUser(userId);
+        //       console.log('Delete user response:', response);
 
-              // Check response status or handle errors
-              if (response.error) {
-                console.error('Failed to delete user:', response.error);
-              } else {
-                console.log('Account deleted successfully with userId:', userId);
-              }
-            } else {
-              console.error('User ID not found, cannot delete account.');
-            }
-          } catch (error) {
-            console.error('Failed to delete account:', error);
-          } finally {
-            setDeleteModalVisible(false);
-          }
-        }}
+        //       // Check response status or handle errors
+        //       if (response.error) {
+        //         console.error('Failed to delete user:', response.error);
+        //       } else {
+        //         console.log('Account deleted successfully with userId:', userId);
+        //       }
+        //     } else {
+        //       console.error('User ID not found, cannot delete account.');
+        //     }
+        //   } catch (error) {
+        //     console.error('Failed to delete account:', error);
+        //   } finally {
+        //     setDeleteModalVisible(false);
+        //   }
+        // }}
         setModalVisible={setDeleteModalVisible}
       />
+
+      {snackBarVisible && (
+        <View style={styles.overlay}>
+          <View style={styles.snackbarContainer}>
+            <View style={styles.snackbar}>
+              <Text style={styles.snackbarText}>
+                {t('Account deleted. You can recover it within 90 days by contacting admin.')}
+              </Text>
+            </View>
+          </View>
+        </View>
+      )}
+
 
       {props?.menu?.map((item, index) => {
         if (item?.id === 3) {
@@ -139,13 +230,17 @@ const SettingsMenu = props => {
                 flexDir={props?.translation === 'ar' ? 'row-reverse' : null}
                 my={2}>
                 <Row
+                  flex={1}
                   flexDir={props?.translation === 'ar' ? 'row-reverse' : null}>
                   {item?.name === 'Bank Details' ? (
                     <Entypo size={20} color={'#6c309c'} name={'credit-card'} />
                   ) : item?.name === 'Change Language' ? (
                     <>
-                    <SettingsLanguageMenu isVisible={isMenuVisible} onClose={handleMenuClose} />
                     <Entypo size={20} color={'#6c309c'} name={'language'} />
+                        {/* <View style={{ justifyContent: 'flex-end' }}>
+                          <SettingsLanguageMenu isVisible={isMenuVisible} onClose={handleMenuClose} />
+                        </View> */}
+                    {/* <SettingsLanguageMenu isVisible={isMenuVisible} onClose={handleMenuClose} /> */}
                     </>
                   ) : item?.name === 'Delete Account' ? (
                     <Ionicons size={20} color={'#6c309c'} name={'trash-outline'} />
@@ -166,6 +261,13 @@ const SettingsMenu = props => {
                     {t(item?.name)}
                   </Text>
                 </Row>
+
+                {item?.name === 'Change Language' && (
+                  <View style={{ justifyContent: 'flex-end', }}>
+                    <SettingsLanguageMenu isVisible={isMenuVisible} onClose={handleMenuClose} />
+                  </View>
+                )}
+
                 <AntDesign
                   name={props?.translation === 'ar' ? 'left' : 'right'}
                   size={15}
@@ -188,4 +290,31 @@ const SettingsMenu = props => {
 
 export default SettingsMenu;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0)',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    zIndex: 1,
+  },
+  snackbarContainer: {
+    backgroundColor: '#FF3434',
+    // padding: 12,
+    borderRadius: 8,
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 16,
+    zIndex: 2,
+  },
+  snackbar: {
+    backgroundColor: '#FF3434',
+    padding: 10,
+    borderRadius: 8,
+    width: '100%',
+    alignItems: 'center',
+  },
+  snackbarText: {
+    color: 'white',
+  },
+});

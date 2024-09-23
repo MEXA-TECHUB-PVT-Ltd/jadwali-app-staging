@@ -237,15 +237,21 @@ const ScheduleOneEvent = props => {
           </Row>
         )}
 
-        <Pressable>
+        <Pressable
+          onPress={() => navigation.navigate('Questions', {
+            questions: props?.data?.questions
+          })}
+        >
           <Input
             mt={5}
             placeholder={t('Questions')}
             // rounded={'md'}
             borderRadius={10}
-            onPressIn={() => navigation.navigate('Questions', {
-              questions: props?.data?.questions
-            })}
+
+            // onPressIn={() => navigation.navigate('Questions', {
+            //   questions: props?.data?.questions
+            // })}
+
             bg={'loc'}
             isReadOnly={true}
             height={50}

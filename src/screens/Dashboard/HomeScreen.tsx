@@ -71,10 +71,22 @@ const HomeScreen = ({ navigation }) => {
     })
   }
 
+  //irfan added to avoid re-render of homescreen untill it is focused
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     const selectedLanguage = i18n.language;
+  //     if (selectedLanguage !== currentLanguage) {
+  //       setLanguage(selectedLanguage);
+  //     }
+  //   }, [currentLanguage])
+  // );
+
 
   React.useEffect(() => {
     setLanguage(i18n.language);
   }, [i18n.language]);
+
+
   const bottomSheetRef = React.createRef();
   const openBottomSheet = () => {
     if (bottomSheetRef.current) {
@@ -124,7 +136,7 @@ const HomeScreen = ({ navigation }) => {
         // status={ale?.status}
         visible={visible}
         onDismiss={() => {
-          setVisible(false);
+        setVisible(false);
 
           // onCopy('Copied');
           // }

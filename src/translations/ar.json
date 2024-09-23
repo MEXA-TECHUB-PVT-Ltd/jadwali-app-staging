@@ -12,6 +12,7 @@
     "Are you sure you want to delete account?": "هل أنت متأكد أنك تريد حذف الحساب؟",
     "Delete": "حذف",
     "Delete Account?": "حذف الحساب؟",
+    "Account deleted. You can recover it within 90 days by contacting admin.": "تم حذف الحساب. يمكنك استرداده خلال 90 يومًا عن طريق الاتصال بالمسؤول.",
     "Forgot Password": "نسيان كلمة السر",
     "Sign In to your Jadwali account": "قم بتسجيل الدخول إلى حسابك في جدولي",
     "Enter your Password": "كلمة السر",
@@ -334,7 +335,7 @@
     "Deposit Price": "سعر الإيداع",
     "Event Scheduled":"الحدث المقرر",
     "Bank Details":"التفاصيل المصرفية",
-    "Referral Link":"رابط الإحالة",
+    "Referral Link":"رابط الإحالة"
 
   }
 }

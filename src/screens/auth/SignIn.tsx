@@ -206,6 +206,12 @@ const SignIn = ({ navigation }: any) => {
     }
   };
 
+  // Function to handle email changes with trimming
+  const handleEmailChange = (handleChange) => (text) => {
+    const trimmedText = text.trim();
+    handleChange('email')(trimmedText);
+  };
+
 
   return (
     <ScrollView keyboardShouldPersistTaps="handled" flex={1} bg={'white'}>
@@ -256,7 +262,8 @@ const SignIn = ({ navigation }: any) => {
                   placeholder={'Enter your Email'}
                   leftIconName={'mail'}
                   height={50}
-                  onChangeText={handleChange('email')}
+                  onChangeText={handleEmailChange(handleChange)}
+                  // onChangeText={handleChange('email')}
                   value={values.email}
                   autoCapitalize={'none'}
                 />

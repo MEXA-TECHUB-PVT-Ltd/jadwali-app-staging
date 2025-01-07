@@ -409,7 +409,7 @@ const timeMinutes = [
                     </Text>
                   </View>
                 )}
-                <JdInputs
+                {/* <JdInputs
                   label={'Event Price'}
                   fontFamily={'NotoSans-SemiBold'}
                   fontSize={18}
@@ -427,7 +427,7 @@ const timeMinutes = [
                       {errors.price}
                     </Text>
                   </View>
-                )}
+                )} */}
                 {/* <JdInputs
                   isDisabled={true}
                   label={'Deposit Price'}
